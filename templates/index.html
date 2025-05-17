@@ -1,0 +1,1223 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CipherGuard : Text Encryption App</title>
+
+    <style>
+      body {
+        background-color: #000;
+        text-align: center;
+      }
+
+      p {
+        font-family: Cambria, Georgia, serif;
+        font-size: 1.2em;
+        color: #fff;
+      }
+      li {
+        font-family: Cambria, Georgia, serif;
+        font-size: 1.2em;
+        color: #fff;
+      }
+
+      .title {
+        font-family: Cambria, Georgia, serif;
+        font-size: 3.5em;
+        color: #fff;
+        text-align: center;
+        text-shadow: rgb(51, 129, 153) 0 0 10px;
+      }
+      h1 {
+        font-family: Cambria, Georgia, serif;
+        font-size: 3em;
+        color: rgb(0, 0, 0);
+        text-align: center;
+        height: 55px;
+      }
+
+      .main {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        height: 1px;
+        width: 1px;
+        background-color: #fff;
+        border-radius: 50%;
+
+        box-shadow: 24vw 9vh 1px 0px #fff, 12vw -24vh 0px 1px #fff,
+          -45vw -22vh 0px 0px #fff, -37vw -40vh 0px 1px #fff,
+          29vw 19vh 0px 1px #fff, 4vw -8vh 0px 1px #fff, -5vw 21vh 1px 1px #fff,
+          -27vw 26vh 1px 1px #fff, -47vw -3vh 1px 1px #fff,
+          -28vw -30vh 0px 1px #fff, -43vw -27vh 0px 1px #fff,
+          4vw 22vh 1px 1px #fff, 36vw 23vh 0px 0px #fff, -21vw 24vh 1px 1px #fff,
+          -16vw 2vh 1px 0px #fff, -16vw -6vh 0px 0px #fff, 5vw 26vh 0px 0px #fff,
+          -34vw 41vh 0px 0px #fff, 1vw 42vh 1px 1px #fff,
+          11vw -13vh 1px 1px #fff, 48vw -8vh 1px 0px #fff,
+          22vw -15vh 0px 0px #fff, 45vw 49vh 0px 0px #fff,
+          43vw -27vh 1px 1px #fff, 20vw -2vh 0px 0px #fff, 8vw 22vh 0px 1px #fff,
+          39vw 48vh 1px 1px #fff, -21vw -11vh 0px 1px #fff,
+          -40vw 45vh 0px 1px #fff, 11vw -30vh 1px 0px #fff,
+          26vw 30vh 1px 0px #fff, 45vw -29vh 0px 1px #fff,
+          -2vw 18vh 0px 0px #fff, -29vw -45vh 1px 0px #fff,
+          -7vw -27vh 1px 1px #fff, 42vw 24vh 0px 0px #fff,
+          45vw -48vh 1px 0px #fff, -36vw -18vh 0px 0px #fff,
+          -44vw 13vh 0px 1px #fff, 36vw 16vh 0px 1px #fff,
+          40vw 24vh 0px 0px #fff, 18vw 11vh 0px 0px #fff,
+          -15vw -23vh 1px 0px #fff, -24vw 48vh 0px 1px #fff,
+          27vw -45vh 1px 0px #fff, -2vw -24vh 0px 1px #fff,
+          -15vw -28vh 0px 0px #fff, -43vw 13vh 1px 0px #fff,
+          7vw 27vh 1px 0px #fff, 47vw 5vh 0px 0px #fff, -45vw 15vh 1px 1px #fff,
+          -5vw -28vh 0px 1px #fff, 38vw 25vh 1px 1px #fff,
+          -39vw -1vh 1px 0px #fff, 5vw 0vh 1px 0px #fff, 49vw 13vh 0px 0px #fff,
+          48vw 10vh 0px 1px #fff, 19vw -28vh 0px 0px #fff, 4vw 7vh 0px 0px #fff,
+          21vw 21vh 1px 1px #fff, -15vw -15vh 0px 1px #fff,
+          -6vw -42vh 1px 0px #fff, -15vw 48vh 1px 1px #fff,
+          -23vw 25vh 1px 1px #fff, -48vw 25vh 0px 1px #fff,
+          -31vw -19vh 0px 1px #fff, 4vw 37vh 1px 1px #fff,
+          -43vw 28vh 0px 0px #fff, 3vw -25vh 0px 1px #fff,
+          -39vw 14vh 0px 1px #fff, -40vw 31vh 0px 1px #fff,
+          35vw -36vh 1px 1px #fff, 16vw 49vh 0px 0px #fff, 6vw 39vh 0px 0px #fff,
+          3vw -35vh 0px 1px #fff, -44vw -2vh 1px 0px #fff,
+          -6vw 21vh 1px 0px #fff, 48vw 9vh 1px 1px #fff, -43vw 30vh 1px 1px #fff,
+          29vw -12vh 1px 1px #fff, -48vw 13vh 1px 0px #fff,
+          -42vw 32vh 1px 1px #fff, 34vw 15vh 1px 1px #fff,
+          29vw -37vh 1px 1px #fff, 28vw 2vh 0px 0px #fff;
+        animation: zoom 10s alternate infinite;
+      }
+
+      @keyframes zoom {
+        0% {
+          transform: scale(1);
+        }
+        100% {
+          transform: scale(1.5);
+        }
+      }
+
+      nav {
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 0 20px;
+  border-radius: 40px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+  display: flex;
+  overflow: hidden;
+  overflow-x: auto;
+  position: relative;
+  color:rgb(0, 0, 0);
+  max-width: 630px;
+
+}
+
+.nav-item {
+  color:rgb(0, 0, 0);
+  font-family: arial, sans-serif;
+  padding: 20px;
+  margin: 0 6px;
+  position: relative;
+  font-family: Cambria, Georgia, serif;
+}
+
+.nav-item:before {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  background-color: #dfe2ea;
+  height: 5px;
+  width: 100%;
+  border-radius: 8px 8px 0 0;
+  left: 0;
+  transition: .3s;
+}
+
+.nav-item:not(.is-active):hover:before {
+  bottom: 0;
+}
+.nav-item:not(.is-active):hover {
+  color: #333;
+}
+
+
+.nav-indicator {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 5px;
+  transition: .4s;
+  border-radius: 8px 8px 0 0;
+}
+
+      .section {
+        -webkit-box-shadow: 0px 0px 9px 5px rgba(255, 255, 255, 0.9);
+        -moz-box-shadow: 0px 0px 9px 5px rgba(255, 255, 255, 0.9);
+        box-shadow: 0px 0px 9px 5px rgba(255, 255, 255, 0.9);
+        max-width: 800px;
+        margin: 40px auto;
+        background: rgba(255, 255, 255, 0.35);
+        padding: 30px;
+        border-radius: 10px;
+      }
+
+      h2 {
+        color: rgb(0, 0, 0);
+        font-family: Cambria, Georgia, serif;
+        font-size: 2.2em;
+        text-align: center;
+      }
+
+      #firsth2 {
+        color: rgb(4, 12, 20);
+        font-family: Cambria, Georgia, serif;
+        font-size: 1.9em;
+        text-align: center;
+        text-shadow: rgba(255, 255, 255, 0.47) 0 0 1px;
+        font-style: italic;
+        height: 50px;
+      }
+
+      #container {
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr;
+        gap: 20px;
+        max-width: 1200px;
+-electronica margin: 40px auto;
+        align-items: center;
+    }
+
+      .slogan {
+        color: rgba(21, 64, 129, 0.88);
+        font-family: Cambria, Georgia, serif;
+        font-size: 2.5em;
+        text-align: center;
+        text-shadow: rgb(255, 255, 255) 0 0 1px;
+        padding: 10px;
+      }
+
+      textarea,
+      input[type="text"],
+      select {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 1em;
+        box-sizing: border-box;
+        background-color: rgba(255, 255, 255, 0.8);
+        color: #333;
+      }
+
+      button {
+        background-color: rgba(0, 0, 0, 0.83);
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 5px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        font-family: Cambria, Georgia, serif;
+        
+      }
+
+      button:hover {
+        background-color: #2980b9;
+      }
+
+      .stars {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        font-size: 2rem;
+        cursor: pointer;
+      }
+
+      .star {
+        color: #ccc;
+        transition: color 0.3s;
+      }
+
+      #output,
+      #outputDecrypt,
+      #feedbackStatus {
+        margin-top: 10px;
+        font-weight: bold;
+      }
+
+      .interactive-image {
+        position: relative;
+        max-width: 100%;
+        margin-top: 20px;
+        cursor: pointer;
+        display: inline-block;
+        transition: transform 0.3s;
+        border-radius: 50%; 
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+      }
+ 
+        img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s;
+            margin: 0 auto;
+
+        }
+        .interactive-image:hover .tooltip {
+            display: block;
+          }
+        .interactive-image:hover img {
+            transform: scale(1.1);
+        }
+
+      .tooltip {
+        display: none;
+        position: absolute;
+        width: 200px;
+        text-align: center;
+        top: 120%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 1.1em;
+      }
+
+      .celebrate {
+        animation: pop 0.5s ease-out;
+      }
+      img {
+        border-radius: 50%;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        transition: transform 0.3s;
+      }
+      img:hover {
+        transform: scale(1.1);
+      }
+
+      @keyframes pop {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.3);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      #usage {
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+        max-width: 800px;
+        margin: 40px auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas: 'enc dec';
+        gap: 20px;
+    }
+    
+    #encusage {
+        line-height: 1.5;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+        box-shadow: 0px 4px 8px 2px rgba(0, 0, 0, 0.5);
+        grid-area: enc;
+    }
+    h3 {
+        color: rgb(0, 0, 0);
+        font-family: Cambria, Georgia, serif;
+        font-size: 2em;
+        text-align: center;
+    } 
+    #encusage h3 {
+        color: rgb(0, 0, 0);
+        font-family: Cambria, Georgia, serif;
+        font-size: 2em;
+        text-align: center;
+    }
+    #encusage ol {
+        list-style-type: decimal;
+        padding-left: 20px;
+    }
+    #encusage li {
+        margin-bottom: 10px;
+    }
+    #encusage:hover {
+        background-color: rgba(0, 0, 0, 0.4);
+        transition: background-color 0.3s;
+        #encusageh3 {
+            color: #fff;
+        }
+    }
+    #decusage:hover {
+        background-color: rgba(0, 0, 0, 0.4);
+        transition: background-color 0.3s;
+        #decusageh3 {
+            color: #fff;
+        }
+    }
+    #decusage h3 {
+        color: rgb(0, 0, 0);
+        font-family: Cambria, Georgia, serif;
+        font-size: 2em;
+        text-align: center;
+    }
+    #decusage ol {
+        list-style-type: decimal;
+        padding-left: 20px;
+    }
+    #decusage li {
+        margin-bottom: 10px;
+    }
+    #encusage p,
+    #decusage p {
+        font-size: 1.2em;
+        color: #fff;
+        margin-top: 10px;
+    }
+    #decusage {
+        line-height: 1.5;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+        box-shadow: 0px 4px 8px 2px rgba(0, 0, 0, 0.5);
+        grid-area: dec;
+    }
+
+    #team img {
+        border-radius: 50%;
+        width: 230px;
+        height: 230px;
+        margin: 20px;
+    }
+    #team div {
+        display: inline-block;
+        margin: 10px;
+    }
+
+    #privacy {
+        background-color: rgba(255, 255, 255, 0.35);
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+        max-width: 1100px;
+        margin: 40px auto;
+    }
+
+    footer {
+        margin-top: 20px;
+        font-size: 1em;
+    }
+
+    #welcome {
+        background-color: rgba(255, 255, 255, 0.35);
+        padding: 10px;
+        border-radius: 10px;
+        max-width: 1100px;
+        margin: 10px auto;
+    }
+
+    #btnenc {
+        margin: 10px 0;
+      }
+
+    #AES {
+        width: 65%;
+        height: auto;
+        margin: 10px 0;
+      }
+
+      #RSA {
+        width: 65%;
+        height: auto;
+        margin: 10px 0;
+      }
+      #ECC {
+        width: 65%;
+        height: auto;
+        margin: 10px 0;
+      }
+
+      #algorithmDetails {
+        margin-top: 10px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color:rgba(24, 22, 22, 0.22);
+      }
+      #algorithmDescription {
+        white-space: pre-wrap;
+        margin-top: 10px;
+        padding: 10px;
+      }
+      #algorithmDescription img {
+        display: inline-block;
+        margin: 10px auto;
+        max-width: 100%;
+        height: auto;
+        border-radius: 5px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+      }
+
+      .btn {
+        background-color: rgba(0, 0, 0, 0.83);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 5px;
+        font-size: 0.8em;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin: 5px 0;
+        
+      }
+
+      .btn:hover {
+        background-color: #2980b9;
+      }
+
+      select {
+        font-family: Cambria, Georgia, serif
+      }
+
+      option {
+        font-family: Cambria, Georgia, serif
+      }
+
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+  <body>
+    <div class="main"></div>
+    <div class="stars"></div>
+    <br />
+    <h1 class="title"><center>CipherGuard</center></h1>
+    <h2 class="slogan">"Secure Every Word, Protect Every Thought."</h2>
+    <br>
+<center>
+<nav>
+  <a href="#welcome" class="nav-item" data-active-color="#c66712" data-target="Home">Home</a>
+  <a href="#algorithms" class="nav-item" data-active-color="green" data-target="About">Algorithms</a>
+  <a href="#howtouse" class="nav-item" data-active-color="blue" data-target="How to Use">How to Use</a>
+  <a href="#encrypt" class="nav-item" data-active-color="red" data-target="Encrypt/Decrypt">Encrypt/Decrypt</a>
+  <a href="#Contact" class="nav-item" data-active-color="rebeccapurple" data-target="Contact">Contact</a>
+  <span class="nav-indicator"></span>
+</nav>
+</center>
+<br>
+<br>
+
+    <script>
+  const indicator = document.querySelector('.nav-indicator');
+const items = document.querySelectorAll('.nav-item');
+
+function handleIndicator(el) {
+
+  items.forEach(item => {
+    item.classList.remove('is-active');
+    item.removeAttribute('style');
+  })
+  
+  const elementColor = el.dataset.activeColor;
+  const target = el.dataset.target;
+  
+ 
+  indicator.style.width = `${el.offsetWidth}px`;
+  indicator.style.backgroundColor = elementColor;
+  indicator.style.left = `${el.offsetLeft}px`;
+  
+
+  el.classList.add('is-active');
+  el.style.color = elementColor;
+}
+
+items.forEach((item, index) => {
+  item.addEventListener('click', e => {
+    handleIndicator(e.target)
+  });
+  item.classList.contains('is-active') && handleIndicator(item);
+});
+      </script>
+    <!-- Welcome Section -->
+    <section class="section" id="welcome">
+      <h1>Welcome to CipherGuard</h1>
+      <h2 style="font-style: italic" id="firsth2">
+        Your favorite Text Encryption App !
+      </h2>
+      <p>Protect your text using state-of-the-art encryption methods.</p>
+    </section>
+    <!-- App Description Section -->
+     
+    <section class="section" id="description">
+      <h2>About the App</h2>
+      <p>
+        This application allows you to encrypt and decrypt text using secure
+        algorithms. You can choose between AES (symmetric encryption), RSA
+        (asymmetric encryption), and ECC (Elliptic Curve Cryptography).
+      </p>
+      <div class="interactive-image">
+        <img
+          src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExYzNqNzUzd291ZzN6Njg0Y2dtam94OHUyYmxvbHRmMnpjbGEwNzdpdyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/mFMksHvN6zpGVdt4QZ/giphy.gif"
+          alt="Padlock"
+          width="100"
+          height="100"  
+        />
+        <div class="tooltip">Click Encrypt to secure your message!</div>
+      </div>
+    </section>
+
+    <!-- Algorithm Explanation Section -->
+    <section class="section" id="algorithms">
+        <h2>Available Algorithms</h2>
+        <ul>
+          <li>
+            <strong style="color:black;">AES:</strong> A fast and secure symmetric encryption method
+            requiring a shared key.
+          </li>
+          <li>
+            <strong style="color:black;">RSA:</strong> A public-key cryptographic algorithm that allows
+            secure key exchange.
+          </li>
+          <li>
+            <strong style="color:black;">ECC:</strong> An efficient and secure method using elliptic
+            curves for public-key cryptography.
+          </li>
+        </ul>
+      </section>
+
+      <section class="section" id="explanation">
+        <h2>Algorithms detailed explanation</h2>
+        <p> Select the algorithm you want to know more about from the list below:</p>
+        <select id="algorithmSelect">
+          <option value="" id="algorithmSelect">Choose Algorithm</option>
+          <option value="AES">AES</option>
+          <option value="RSA">RSA</option>
+          <option value="ECC">ECC</option>
+        </select>
+        <div id="algorithmDetails" style="display: none;">
+          <h3 id="algorithmTitle"></h3>
+          <p id="algorithmDescription"></p>
+        </div>
+        <script>
+          const algorithmSelect = document.getElementById("algorithmSelect");
+          const algorithmDetails = document.getElementById("algorithmDetails");
+          const algorithmTitle = document.getElementById("algorithmTitle");
+          const algorithmDescription = document.getElementById(
+            "algorithmDescription"
+          );
+
+          algorithmSelect.addEventListener("change", () => {
+            const selectedAlgorithm = algorithmSelect.value;
+            if (selectedAlgorithm) {
+              algorithmDetails.style.display = "block";
+              algorithmTitle.textContent = selectedAlgorithm;
+              switch (selectedAlgorithm) {
+                case "AES":
+                  algorithmDescription.innerHTML =
+                  "AES (Advanced Encryption Standard) is a <strong>symmetric encryption</strong> algorithm that uses the same key for both encryption and decryption.<br><br>" +
+                  "It encrypts data in 128-bit blocks and applies multiple transformation rounds using a secret key. AES is known for its speed and strong security.<br><br>" +
+                  "<strong style='color:black;'>Use Case:</strong> Encrypting files, messages, or data at rest.<br>" +
+                  "<strong style='color:black;'>Example:</strong> Encrypting 'Hello, World!' with key '1234567890ABCDEF'<br><br>" +
+                  "<img id='AES' src='https://cdn.prod.website-files.com/5ff66329429d880392f6cba2/67b431c85d2112aaa730a2f2_618e3f3ff8ffcc7e84a823cd_AES%2520algorithm%2520working.png' alt='AES Example' style='height: auto; margin: 10px 0;'>";
+                  break;
+                case "RSA":
+  algorithmDescription.innerHTML =
+    "RSA (Rivest-Shamir-Adleman) is an asymmetric encryption algorithm that uses two keys:<br>" +
+    "- a <strong style='color:black;'>public key</strong> for encryption<br>" +
+    "- a <strong style='color:black;'>private key</strong> for decryption.<br><br>" +
+    "The security of RSA is based on the difficulty of factoring large numbers.<br><br>" +
+    "<strong style='color:black;'>How the numbers are calculated:</strong><br>" +
+    "1. Choose two prime numbers: p = 11, q = 17<br>" +
+    "2. Compute n = p × q = 187<br>" +
+    "3. Compute φ(n) = (p-1)(q-1) = 160<br>" +
+    "4. Choose e such that 1 < e < φ(n), and e is coprime to φ(n): e = 7<br>" +
+    "5. Compute d such that (d × e) mod φ(n) = 1 ⇒ d = 23<br>" +
+    "Public Key = (e, n) = (7, 187), Private Key = (d, n) = (23, 187)<br><br>" +
+    "<strong style='color:black;'>Example:</strong> Encrypting message 5 → Cipher = (5^7) mod 187 = 47<br><br>" +
+    "<img id='RSA' src='https://www.securew2.com/wp-content/uploads/2024/01/RSA-Encryption-Works.png' alt='RSA Example' style='height: auto; margin: 10px 0;'>";
+  break;
+
+
+case "ECC":
+  algorithmDescription.innerHTML =
+    "ECC (Elliptic Curve Cryptography) is an asymmetric encryption technique based on elliptic curves over finite fields.<br><br>" +
+    "Instead of multiplying large prime numbers like in RSA, ECC uses math on points of a curve to create secure keys.<br><br>" +
+    "<strong style='color:black;'>Key idea:</strong> It's very hard to reverse the equation used to generate the key (called the Elliptic Curve Discrete Logarithm Problem).<br><br>" +
+    "<strong style='color:black;'>Simple Example:</strong><br>" +
+    "Let the elliptic curve be: y² = x³ + ax + b (mod p)<br>" +
+    "Pick a point G (generator) on the curve.<br>" +
+    "Private key: a number like <code>d = 7</code><br>" +
+    "Public key: point Q = d × G (repeated addition)<br><br>" +
+    "Given G and Q, it's nearly impossible to guess d!<br><br>" +
+    "<img id='ECC' src='https://cf-assets.www.cloudflare.com/zkvhlag99gkb/5T0bi5LllWSsEHVH8u3LxV/948c802208e9cd39782d1587087a2670/image02.gif' alt='ECC Example' style='height: auto; margin: 10px 0;'>";
+  break;
+                default:
+                  algorithmDetails.style.display = "none";
+              }
+            } else {
+              algorithmDetails.style.display = "none";
+            }
+          });
+        </script>
+        <p>
+          <strong style="color:black;">Note:</strong> In general, the choice of algorithm depends on your
+          security needs. AES is fast and suitable for large data, while RSA and
+          ECC are better for secure key exchange.
+        </p>
+      </section>
+    <!-- Usage Instructions Section -->
+    <section class="section" id="howtouse">
+      <h2>How to Use</h2>
+        <p>
+            To encrypt or decrypt text, follow these steps:
+        </p>
+        <div id="usage">
+        <div id="encusage"> 
+
+        <h3 id="encusageh3">Encryption</h3>
+      <ol>
+        <li>Enter the text you want to encrypt</li>
+        <li>Select the encryption algorithm.</li>
+        <li>For AES, provide a (base64 encoded) key (completely optional!).</li>
+        <li>For RSA and ECC, the system will automatically generate all the key pairs.</li>
+        <li>Click "Encrypt" to generate your cipher.</li>
+      </ol>
+        <p>
+            <strong style="color:black;">Note:</strong> The key is optional for AES. If you
+            don't provide it, the system will generate it for you.
+        </p>
+        </div>
+        
+        <div id="decusage"> 
+
+        <h3 id="decusageh3">Decryption</h3>
+        <ol>
+        <li>Enter the encrypted text you want to decrypt</li>
+        <li>The decryption algorithm will be automatically applied.</li>
+        <li>For AES, paste the key and IV used for encryption.</li>
+        <li>For RSA, paste the receiver's private key used for encryption.</li>
+        <li>For ECC, paste all of the sender's public key, the IV and the receiver's private key used for encryption.</li>
+        <li>Click "Decrypt" to retrieve your original text.</li>
+        </ol>
+        <p>
+            <strong style="color:black;">Note:</strong> Ensure you have the correct key(s) (and IV if needed) for
+            decryption so you can retrieve your plaintext. The public/private keys must be in PEM format with at least 3 lines (BEGIN, data, END).
+        </p>
+    </div>
+</div>
+    </section>  
+
+
+    <!-- Encryption Section -->
+    <section class="section" id="encrypt">
+    <h2>Encrypt Text</h2>
+    <textarea id="inputText" placeholder="Enter text to encrypt"></textarea>
+    <select id="algorithm" onchange="toggleKeyField('algorithm', 'keyField')">
+      <option value="">Choose Algorithm</option>
+      <option value="AES">AES</option>
+      <option value="RSA">RSA</option>
+      <option value="ECC">ECC</option>
+    </select>
+    <div id="algorithmDesc"></div>
+      <div id="keyField">
+        <input
+          type="text"
+          id="keyEncrypt"
+          placeholder="Key (AES only, optional)"
+          style="font-family: monospace;"
+        />
+
+      </div>
+    </div>
+    <button id="btnenc" onclick="process('encrypt')"><i class="fa fa-lock"></i> Encrypt</button>
+    <p id="output" style="white-space: pre-wrap"></p>
+    
+</section>
+
+<script>
+    function sanitizeInput(input) {
+        let sanitized = input || '';
+    
+        // Trim and limit length (e.g., 1000 characters to prevent overload)
+        sanitized = sanitized.trim().substring(0, 1000);
+    
+        // Check for suspicious patterns in the raw input
+        const suspiciousPatterns = [
+            /<script/gi,
+            /<iframe/gi,
+            /select\s+.*from/gi,
+            /drop\s+table/gi,
+            /eval\(/gi,
+            /alert\(/gi
+        ];
+        let isSuspicious = false;
+        suspiciousPatterns.forEach(pattern => {
+            if (pattern.test(sanitized)) {
+                isSuspicious = true;
+            }
+        });
+        if (isSuspicious) {
+            return { error: 'Suspicious input detected. Please remove code, scripts, or SQL-like commands.' };
+        }
+    
+        // Escape HTML to prevent XSS (optional, since we're blocking suspicious input)
+        const tempElement = document.createElement('div');
+        tempElement.textContent = sanitized;
+        sanitized = tempElement.innerHTML;
+    
+        return { sanitized: sanitized };
+    }
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const keyField = document.getElementById("keyField");
+      const algorithmSelect = document.getElementById("algorithm");
+      keyField.style.display = "none"; // Hide key field by default
+
+      algorithmSelect.addEventListener("change", () => {
+        const selectedAlgorithm = algorithmSelect.value;
+        if (selectedAlgorithm === "AES") {
+          keyField.style.display = "block";
+        } else {
+          keyField.style.display = "none";
+        }
+      });
+    });
+  </script>
+
+    <script>
+      function toggleKeyField(algorithm, keyField) {
+        const selectedAlgorithm = document.getElementById(algorithm).value;
+        const keyFieldDiv = document.getElementById(keyField);
+        const algorithmDesc = document.getElementById("algorithmDesc");
+
+        if (selectedAlgorithm === "AES") {
+          keyFieldDiv.style.display = "block";
+          algorithmDesc.textContent =
+            "AES is a symmetric encryption algorithm. You can provide a key for encryption.";
+        } else if (selectedAlgorithm === "RSA") {
+          keyFieldDiv.style.display = "none";
+          algorithmDesc.textContent =
+            "RSA is an asymmetric encryption algorithm. The system will generate the key pairs for you.";
+        } else if (selectedAlgorithm === "ECC") {
+          keyFieldDiv.style.display = "none";
+          algorithmDesc.textContent =
+            "ECC is an asymmetric encryption algorithm. The system will generate the key pairs for you, which are then used to derive a secure AES key that performs the actual encryption and decryption.";
+        } else {
+          keyFieldDiv.style.display = "none";
+          algorithmDesc.textContent = "";
+        }
+      }
+
+
+    </script>
+    <!-- Decryption Section -->
+    <section class="section" id="decrypt">
+    <h2>Decrypt Text</h2>
+    <textarea
+      id="inputTextDecrypt"
+      placeholder="Enter cipher to decrypt"
+    ></textarea>
+    <select id="algorithmDecrypt" onchange="toggleKeyField('algorithmDecrypt', 'keyFieldDecrypt')">
+      <option value="">Choose Algorithm</option>
+      <option value="AES">AES</option>
+      <option value="RSA">RSA</option>
+      <option value="ECC">ECC</option>
+    </select>
+    <div id="algorithmDesc"></div>
+    <div id="keyFieldDecrypt" style="display: none;">
+      <textarea
+        id="keyDecrypt"
+        placeholder="Paste ECC Public Key"
+        style="width: 300px; height: 100px"
+        oninput="normalizeKey(this)"
+      ></textarea>
+      <input
+        type="text"
+        id="ivDecrypt"
+        placeholder="Enter IV (AES or ECC)"
+      />
+    </div>
+    <center><textarea
+      id="rsaKeyDecrypt"
+      placeholder="Paste Receiver's Private Key"
+      style="display: none; width: 300px; height: 100px"
+      oninput="normalizePrivateKey(this)"
+    ></textarea></center>
+    
+    <button onclick="process('decrypt')"><i class="fa fa-unlock"></i> Decrypt</button>
+    <p id="outputDecrypt"></p>
+</section>
+<!-- Meet the Team -->
+<section class="section" id="team">
+    <h2>Meet the Team</h2>
+    <div style="gap: 20px">
+      <div>
+        <a href="https://www.linkedin.com/in/ahmedmnaouer/" target="_blank">
+          <img
+            src="https://media.licdn.com/dms/image/v2/D4D03AQEmHPkhGWCjPg/profile-displayphoto-shrink_800_800/B4DZW0cfrxHYAc-/0/1742489124732?e=1752105600&v=beta&t=2pWZvjve4SQpanIHHDxG6vFs_B-WBwllF6FC6Su3U5w"
+            alt="Ahmed Mnaouer"
+            width="200"
+            height="200"
+          />
+        </a>
+        <p style="font-size: 1.5em">Ahmed Mnaouer</p>
+      </div>
+
+      <div>
+        <a
+          href="https://www.linkedin.com/in/roua-abassi-accessibility-bd/"
+          target="_blank"
+        >
+          <img
+            src="https://media.licdn.com/dms/image/v2/C4E03AQGiwk14d08wCg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1655742765526?e=1752105600&v=beta&t=6KlzZKF5K7Y_-2L1cpe2IQXb76N1oLOlF5pM4iYom9c"
+            alt="Roua Abassi"
+            width="200"
+            height="200"
+          />
+        </a>
+        <p style="font-size: 1.5em">Roua Abassi</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Rating Section -->
+  <section class="section" id="rating">
+    <h2>Rate Us</h2>
+    <div class="stars">
+      <span class="star" onclick="rateApp(1)">★</span>
+      <span class="star" onclick="rateApp(2)">★</span>
+      <span class="star" onclick="rateApp(3)">★</span>
+      <span class="star" onclick="rateApp(4)">★</span>
+      <span class="star" onclick="rateApp(5)">★</span>
+    </div>
+    <p>Click on the stars to rate us!</p>
+  </section>
+
+  <!-- Feedback Section -->
+  <section class="section" id="feedback">
+    <h2>Your Feedback Matters</h2>
+    <p>Your feedback helps us improve!</p>
+    <textarea
+      id="feedbackText"
+      placeholder="Enter your feedback here..."
+    ></textarea>
+    <input type="text" id="surname" placeholder="Your surname (optional)" style="font-family: monospace;" />
+    <button onclick="submitFeedback()">Submit Feedback</button>
+    <p id="feedbackStatus"></p>
+  </section>
+  <!-- Contact Us -->
+  <section class="section" id="Contact">
+    <h2>Contact Us</h2>
+    <p>
+      If you need help or have any questions, we are here for you. Reach us
+      at:
+    </p>
+    <p><strong style="color: #000000; font-weight: bold;">Email:</strong> 
+        <a href="mailto:support@cipherguard.com" 
+        style="padding: 2px 4px; background-color: #f0f0f0; border-radius: 3px">
+        support@cipherguard.com</a></p>
+  </section>
+    <!-- Privacy Policy -->
+    <section class="section" id="privacy">
+  <h2>Privacy Policy</h2>
+  <p>
+    Your privacy is important to us. We do not store any of your data or
+    encryption keys. All operations are performed locally in your browser.
+    We do not share your data with any third parties.
+  </p>
+  <p>
+    <strong style="color:black;">Disclaimer:</strong> This application is for educational purposes only. 
+    Always use well-tested libraries and frameworks for production-level encryption.
+  </p>
+</section>
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 CipherGuard. All rights reserved.</p>
+    <p>Made with ❤️ by Ahmed Mnaouer and Roua Abassi</p>
+  </footer>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    function rateApp(rating) {
+      const stars = document.querySelectorAll(".star");
+      stars.forEach((star, index) => {
+        star.style.color = index < rating ? "#f1c40f" : "#ccc";
+        star.classList.remove("celebrate");
+        if (index < rating) {
+          star.classList.add("celebrate");
+          setTimeout(() => star.classList.remove("celebrate"), 500);
+        }
+      });
+    }
+
+    function submitFeedback() {
+      const feedback = document.getElementById("feedbackText").value;
+      const surname = document.getElementById("surname").value;
+      if (feedback.trim() === "") {
+        document.getElementById(
+          "feedbackStatus"
+        ).textContent = `Please enter your feedback before submitting.`;
+        return;
+      }
+      document.getElementById("feedbackStatus").textContent = `Thank you${
+        surname ? ", " + surname : ""
+      } for your feedback!`;
+      document.getElementById("feedbackText").value = "";
+      document.getElementById("surname").value = "";
+    }
+</script>
+<script>
+  let lastAlgorithm = null;
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const algorithmEncrypt = document.getElementById("algorithm");
+    const algorithmDecrypt = document.getElementById("algorithmDecrypt");
+    const keyDecrypt = document.getElementById("keyDecrypt");
+    const ivDecrypt = document.getElementById("ivDecrypt");
+    const rsaKeyDecrypt = document.getElementById("rsaKeyDecrypt");
+
+    algorithmEncrypt.addEventListener("change", () => {
+      lastAlgorithm = algorithmEncrypt.value;
+      algorithmDecrypt.value = lastAlgorithm;
+      updateDecryptFields(lastAlgorithm);
+    });
+
+    algorithmDecrypt.addEventListener("change", () => {
+      updateDecryptFields(algorithmDecrypt.value);
+    });
+
+    function updateDecryptFields(algorithm) {
+      const keyFieldDecrypt = document.getElementById("keyFieldDecrypt");
+      if (algorithm === "AES") {
+        keyFieldDecrypt.style.display = "block";
+        rsaKeyDecrypt.style.display = "none";
+        keyDecrypt.placeholder = "Enter AES Symmetric Key";
+        ivDecrypt.placeholder = "Enter IV";
+        ivDecrypt.style.fontFamily = "monospace";
+        ivDecrypt.style.fontSize = "1.2em";
+      } else if (algorithm === "RSA") {
+        keyFieldDecrypt.style.display = "none";
+        rsaKeyDecrypt.style.display = "block";
+      } else if (algorithm === "ECC") {
+        keyFieldDecrypt.style.display = "block";
+        rsaKeyDecrypt.style.display = "block";
+        keyDecrypt.placeholder = "Paste Sender's Public Key";
+        ivDecrypt.placeholder = "Enter IV";
+        ivDecrypt.style.fontFamily = "monospace";
+        ivDecrypt.style.fontSize = "1.2em";
+      } else {
+        keyFieldDecrypt.style.display = "none";
+        rsaKeyDecrypt.style.display = "none";
+      }
+    }
+
+    // Normalize key input to ensure PEM boundaries and multi-line format
+    function normalizeKey(input) {
+      let value = input.value.trim();
+      if (value) {
+        if (!value.startsWith('-----BEGIN PUBLIC KEY-----')) {
+          value = '-----BEGIN PUBLIC KEY-----\n' + value;
+        }
+        if (!value.endsWith('-----END PUBLIC KEY-----')) {
+          value = value + '\n-----END PUBLIC KEY-----';
+        }
+        // Ensure at least 3 lines by adding a line break in the key data
+        const lines = value.split('\n');
+        if (lines.length < 3) {
+          const keyData = lines[1] || lines[0];
+          value = `-----BEGIN PUBLIC KEY-----\n${keyData}\n-----END PUBLIC KEY-----`;
+        }
+      }
+      input.value = value;
+    }
+
+    // Normalize private key input to ensure PEM boundaries
+    function normalizePrivateKey(textarea) {
+      let value = textarea.value.trim();
+      if (value) {
+        if (!value.startsWith('-----BEGIN EC PRIVATE KEY-----')) {
+          value = '-----BEGIN EC PRIVATE KEY-----\n' + value;
+        }
+        if (!value.endsWith('-----END EC PRIVATE KEY-----')) {
+          value = value + '\n-----END EC PRIVATE KEY-----';
+        }
+        // Ensure at least 3 lines by adding a line break in the key data
+        const lines = value.split('\n');
+        if (lines.length < 3) {
+          const keyData = lines[1] || lines[0];
+          value = `-----BEGIN EC PRIVATE KEY-----\n${keyData}\n-----END EC PRIVATE KEY-----`;
+        }
+      }
+      textarea.value = value;
+    }
+  });
+
+  async function process(action) {
+    const isEncrypt = action === "encrypt";
+    const inputText = document.getElementById(
+        isEncrypt ? "inputText" : "inputTextDecrypt"
+    ).value;
+    const algorithm = isEncrypt
+        ? document.getElementById("algorithm").value
+        : document.getElementById("algorithmDecrypt").value;
+    const outputElem = document.getElementById(
+        isEncrypt ? "output" : "outputDecrypt"
+    );
+
+    if (!inputText || !algorithm) {
+        outputElem.innerHTML = "<span style='color: black;'>Error:</span> Input text and algorithm are required.";
+        outputElem.className = 'error';
+        return;
+    }
+
+    // Sanitize the input text
+    const sanitizedResult = sanitizeInput(inputText);
+    if (sanitizedResult.error) {
+        outputElem.innerHTML = "<span style='color: black;'>Error: </span> " + sanitizedResult.error;
+        outputElem.className = 'error';
+        return;
+    }
+    const sanitizedText = sanitizedResult.sanitized;
+
+    let key = null,
+        iv = null,
+        rsaKey = null;
+    if (isEncrypt) {
+        key = document.getElementById("keyEncrypt").value || null;
+
+    } else {
+        if (algorithm === "AES") {
+            key = document.getElementById("keyDecrypt").value;
+            iv = document.getElementById("ivDecrypt").value;
+            if (!key || !iv) {
+                outputElem.innerHTML = `<span style='color: black;'>Error:</span> Both Key and IV are required for ${algorithm} decryption.`;
+                return;
+            }
+            
+        } else if (algorithm === "RSA") {
+            rsaKey = document.getElementById("rsaKeyDecrypt").value;
+            if (!rsaKey) {
+                outputElem.innerHTML = `<span style='color: black;'>Error:</span> RSA Private Key is required.`;
+                return;
+            }
+        } else if (algorithm === "ECC") {
+            key = document.getElementById("keyDecrypt").value;
+            iv = document.getElementById("ivDecrypt").value;
+            rsaKey = document.getElementById("rsaKeyDecrypt").value;
+            if (!key || !iv || !rsaKey) {
+                outputElem.innerHTML = `<span style='color: black;'>Error:</span> Sender's Public Key, IV, and Receiver's Private Key are required for ECC decryption.`;
+                return;
+            }
+        }
+    }
+
+    try {
+        const response = await fetch(`/${action}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                text: sanitizedText,
+                algorithm,
+                key: key ? (algorithm === "ECC" && !isEncrypt ? key : key) : null,
+                iv: iv ? (algorithm === "ECC" && !isEncrypt ? iv : iv) : null,
+                rsaKey: rsaKey,
+            }),
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            outputElem.innerHTML = `<span style='color: black;'>Error:</span> ${error}`;
+            return;
+        }
+
+        const result = await response.json();
+        if (isEncrypt) {
+            let output = '';
+            if (result.ciphertext) {
+                output += `<div><span style="color: black;">Ciphertext:</span> <span id="ciphertext" style="word-wrap: break-word; display: inline-block; max-width: 100%;">${result.ciphertext}</span> <button class='btn' onclick="copyToClipboard('ciphertext')"><i class="fa fa-copy"></i></button></div>`;
+            }
+            if (result.key) {
+                output += `<div><span style="color: black;">Key: </span> <span id="key">${result.key}</span> <button class = 'btn' onclick="copyToClipboard('key')"><i class="fa fa-copy"></i></button></div>`;
+            }
+            if (result.iv) {
+                output += `<div><span style="color: black;">IV: </span><span id="iv">${result.iv}</span> <button class = 'btn' onclick="copyToClipboard('iv')"><i class="fa fa-copy"></i></button></div>`;
+            }
+            if (result.public_key) {
+                output += `<div><span style="color: black;">Sender's Public Key: </span><span id="public_key">${result.public_key}</span> <button class = 'btn' onclick="copyToClipboard('public_key')"><i class="fa fa-copy"></i></button></div>`;
+            }
+            if (result.private_key) {
+                output += `<div><span style="color: black;">Sender's Private Key: </span><span id="private_key">${result.private_key}</span></div>`;
+            }
+            if (result.receiver_public_key) {
+                output += `<div><span style="color: black;">Receiver's Public Key: </span><span id="receiver_public_key">${result.receiver_public_key}</span></div>`;
+            }
+            if (result.receiver_private_key) {
+                output += `<div><span style="color: black;">Receiver's Private Key: </span><span id="receiver_private_key">${result.receiver_private_key}</span> <button class = 'btn' onclick="copyToClipboard('receiver_private_key')"><i class="fa fa-copy"></i></button></div>`;
+            }
+            if (result.aes_key) {
+                output += `<div><span style="color: black;">AES key: </span><span id="aes_key">${result.aes_key}</span></div>`;
+            }
+            outputElem.innerHTML = output;
+        } else {
+            outputElem.innerHTML = `<div><span style="color: black;">Plaintext: </span><span id="plaintext">${result.plaintext}</span></div>`;
+        }
+    } catch (error) {
+        outputElem.innerHTML = `<span style='color: black;'>Error:</span> ${error.message}`;
+    }
+}
+
+    function copyToClipboard(elementId) {
+        const text = document.getElementById(elementId).textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            alert(`Copied ${elementId} to clipboard!`);
+        });
+    }
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93d384e9cd725082',t:'MTc0NjgxODA1OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93e0cc6628f853d4',t:'MTc0Njk1NzMwMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93e2a79669b5bcba',t:'MTc0Njk3Njc2Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
